@@ -2,10 +2,9 @@ package niccolosorrenti.basketballStatsTrackerBackend.payloads.response;
 
 import java.util.UUID;
 
-public record GameStatResponseDTO(
+public record UserResponseDTO(
         UUID id,
-        Integer points,
-        Integer assists,
-        Integer rebounds
+        String username,
+        String email
 ) {
 }

@@ -1,4 +1,6 @@
 package niccolosorrenti.basketballStatsTrackerBackend.payloads.response;
 
-public class LoginResponseDTO {
+public record LoginResponseDTO(
+        String token
+) {
 }
