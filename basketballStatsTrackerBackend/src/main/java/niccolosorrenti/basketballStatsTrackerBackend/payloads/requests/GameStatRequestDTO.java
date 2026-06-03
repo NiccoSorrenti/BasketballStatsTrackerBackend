@@ -1,16 +1,20 @@
 package niccolosorrenti.basketballStatsTrackerBackend.payloads.requests;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 
 public record GameStatRequestDTO(
 
-        @Min(value = 0)
+        @NotNull(message = "Points are required")
+        @Min(value = 0, message = "Points cannot be negative")
         Integer points,
 
-        @Min(value = 0)
+        @NotNull(message = "Assists are required")
+        @Min(value = 0, message = "Assists cannot be negative")
         Integer assists,
 
-        @Min(value = 0)
+        @NotNull(message = "Rebounds are required")
+        @Min(value = 0, message = "Rebounds cannot be negative")
         Integer rebounds
 
 ) {

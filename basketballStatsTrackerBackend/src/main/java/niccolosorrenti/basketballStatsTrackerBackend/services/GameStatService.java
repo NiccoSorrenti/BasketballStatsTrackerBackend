@@ -3,6 +3,7 @@ package niccolosorrenti.basketballStatsTrackerBackend.services;
 import lombok.RequiredArgsConstructor;
 import niccolosorrenti.basketballStatsTrackerBackend.entities.GameStat;
 import niccolosorrenti.basketballStatsTrackerBackend.entities.User;
+import niccolosorrenti.basketballStatsTrackerBackend.exceptions.UnauthorizedException;
 import niccolosorrenti.basketballStatsTrackerBackend.payloads.requests.GameStatRequestDTO;
 import niccolosorrenti.basketballStatsTrackerBackend.repositories.GameStatRepository;
 import niccolosorrenti.basketballStatsTrackerBackend.repositories.UserRepository;
@@ -54,7 +55,9 @@ public class GameStatService {
                 .orElseThrow(() -> new RuntimeException("Game not found"));
 
         if (!gameStat.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException(
+                    "You are not allowed to modify this game"
+            );
         }
 
         gameStat.setPoints(payload.points());
