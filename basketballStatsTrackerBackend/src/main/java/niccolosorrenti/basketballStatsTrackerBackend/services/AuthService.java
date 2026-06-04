@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import niccolosorrenti.basketballStatsTrackerBackend.entities.User;
 import niccolosorrenti.basketballStatsTrackerBackend.enums.Role;
 import niccolosorrenti.basketballStatsTrackerBackend.exceptions.BadRequestException;
-import niccolosorrenti.basketballStatsTrackerBackend.exceptions.NotFoundException;
 import niccolosorrenti.basketballStatsTrackerBackend.exceptions.UnauthorizedException;
 import niccolosorrenti.basketballStatsTrackerBackend.payloads.requests.LoginRequestDTO;
 import niccolosorrenti.basketballStatsTrackerBackend.payloads.requests.RegisterRequestDTO;
@@ -30,7 +29,7 @@ public class AuthService {
         }
 
         if (userRepository.existsByUsername(payload.username())) {
-            throw new RuntimeException("Username already exists");
+            throw new BadRequestException("Username already exists");
         }
 
         User user = User.builder()
@@ -46,7 +45,7 @@ public class AuthService {
     public String login(LoginRequestDTO payload) {
 
         User user = userRepository.findByEmail(payload.email())
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
 
         if (!passwordEncoder.matches(payload.password(), user.getPassword())) {
             throw new UnauthorizedException("Invalid credentials");
