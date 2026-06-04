@@ -3,8 +3,10 @@ package niccolosorrenti.basketballStatsTrackerBackend.services;
 import lombok.RequiredArgsConstructor;
 import niccolosorrenti.basketballStatsTrackerBackend.entities.GameStat;
 import niccolosorrenti.basketballStatsTrackerBackend.entities.User;
+import niccolosorrenti.basketballStatsTrackerBackend.exceptions.NotFoundException;
 import niccolosorrenti.basketballStatsTrackerBackend.exceptions.UnauthorizedException;
 import niccolosorrenti.basketballStatsTrackerBackend.payloads.requests.GameStatRequestDTO;
+import niccolosorrenti.basketballStatsTrackerBackend.payloads.response.GameStatsSummaryDTO;
 import niccolosorrenti.basketballStatsTrackerBackend.repositories.GameStatRepository;
 import niccolosorrenti.basketballStatsTrackerBackend.repositories.UserRepository;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ public class GameStatService {
                 .points(payload.points())
                 .assists(payload.assists())
                 .rebounds(payload.rebounds())
+                .opponentTeam(payload.opponentTeam())
+                .result(payload.result())
                 .user(user)
                 .build();
 
@@ -63,6 +67,8 @@ public class GameStatService {
         gameStat.setPoints(payload.points());
         gameStat.setAssists(payload.assists());
         gameStat.setRebounds(payload.rebounds());
+        gameStat.setOpponentTeam(payload.opponentTeam());
+        gameStat.setResult(payload.result());
 
         return gameStatRepository.save(gameStat);
     }
@@ -80,5 +86,89 @@ public class GameStatService {
         }
 
         gameStatRepository.delete(gameStat);
+    }
+
+    public GameStatsSummaryDTO getSummary(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        List<GameStat> games = gameStatRepository.findByUser(user);
+
+        int totalGames = games.size();
+
+        if (totalGames == 0) {
+            return new GameStatsSummaryDTO(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "Rookie");
+        }
+
+        double avgPoints = games.stream()
+                .mapToInt(GameStat::getPoints)
+                .average()
+                .orElse(0);
+
+        double avgAssists = games.stream()
+                .mapToInt(GameStat::getAssists)
+                .average()
+                .orElse(0);
+
+        double avgRebounds = games.stream()
+                .mapToInt(GameStat::getRebounds)
+                .average()
+                .orElse(0);
+
+        int totalPoints = games.stream()
+                .mapToInt(GameStat::getPoints)
+                .sum();
+
+        int totalAssists = games.stream()
+                .mapToInt(GameStat::getAssists)
+                .sum();
+
+        int totalRebounds = games.stream()
+                .mapToInt(GameStat::getRebounds)
+                .sum();
+
+        int careerHighPoints = games.stream()
+                .mapToInt(GameStat::getPoints)
+                .max()
+                .orElse(0);
+
+        int careerHighAssists = games.stream()
+                .mapToInt(GameStat::getAssists)
+                .max()
+                .orElse(0);
+
+        int careerHighRebounds = games.stream()
+                .mapToInt(GameStat::getRebounds)
+                .max()
+                .orElse(0);
+
+        String playerType;
+
+        if (avgPoints >= 20 && avgAssists >= 7 && avgRebounds >= 7) {
+            playerType = "All Around Player";
+        } else if (avgPoints >= 20) {
+            playerType = "Scorer";
+        } else if (avgAssists >= 7) {
+            playerType = "Playmaker";
+        } else if (avgRebounds >= 10) {
+            playerType = "Rebounder";
+        } else {
+            playerType = "Role Player";
+        }
+
+        return new GameStatsSummaryDTO(
+                totalGames,
+                Math.round(avgPoints * 10.0) / 10.0,
+                Math.round(avgAssists * 10.0) / 10.0,
+                Math.round(avgRebounds * 10.0) / 10.0,
+                totalPoints,
+                totalAssists,
+                totalRebounds,
+                careerHighPoints,
+                careerHighAssists,
+                careerHighRebounds,
+                playerType
+        );
     }
 }

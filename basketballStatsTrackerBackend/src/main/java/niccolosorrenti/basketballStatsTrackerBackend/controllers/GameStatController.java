@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import niccolosorrenti.basketballStatsTrackerBackend.entities.GameStat;
 import niccolosorrenti.basketballStatsTrackerBackend.payloads.requests.GameStatRequestDTO;
 import niccolosorrenti.basketballStatsTrackerBackend.payloads.response.GameStatResponseDTO;
+import niccolosorrenti.basketballStatsTrackerBackend.payloads.response.GameStatsSummaryDTO;
 import niccolosorrenti.basketballStatsTrackerBackend.services.GameStatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -36,7 +37,9 @@ public class GameStatController {
                 savedGame.getId(),
                 savedGame.getPoints(),
                 savedGame.getAssists(),
-                savedGame.getRebounds()
+                savedGame.getRebounds(),
+                savedGame.getOpponentTeam(),
+                savedGame.getResult()
         );
     }
 
@@ -53,7 +56,9 @@ public class GameStatController {
                         game.getId(),
                         game.getPoints(),
                         game.getAssists(),
-                        game.getRebounds()
+                        game.getRebounds(),
+                        game.getOpponentTeam(),
+                        game.getResult()
                 ))
                 .toList();
     }
@@ -74,7 +79,9 @@ public class GameStatController {
                 updatedGame.getId(),
                 updatedGame.getPoints(),
                 updatedGame.getAssists(),
-                updatedGame.getRebounds()
+                updatedGame.getRebounds(),
+                updatedGame.getOpponentTeam(),
+                updatedGame.getResult()
         );
     }
 
@@ -88,5 +95,12 @@ public class GameStatController {
         String email = authentication.getName();
 
         gameStatService.delete(id, email);
+    }
+
+    @GetMapping("/summary")
+    public GameStatsSummaryDTO getSummary(Authentication authentication) {
+        String email = authentication.getName();
+
+        return gameStatService.getSummary(email);
     }
 }

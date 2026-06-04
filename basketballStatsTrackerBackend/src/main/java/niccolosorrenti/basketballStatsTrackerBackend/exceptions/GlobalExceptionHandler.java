@@ -61,10 +61,12 @@ public class GlobalExceptionHandler {
             Exception ex
     ) {
 
+        ex.printStackTrace();
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
                         new ErrorResponseDTO(
-                                ex.getMessage(),
+                                "Internal server error",
                                 LocalDateTime.now()
                         )
                 );

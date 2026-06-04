@@ -2,6 +2,7 @@ package niccolosorrenti.basketballStatsTrackerBackend.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import niccolosorrenti.basketballStatsTrackerBackend.enums.GameResult;
 
 import java.util.UUID;
 
@@ -30,4 +31,11 @@ public class GameStat {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @Column(nullable = false)
+    private String opponentTeam;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GameResult result;
 }
